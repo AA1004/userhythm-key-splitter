@@ -1,0 +1,25 @@
+﻿[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "userhythm-key-splitter"
+version = "0.1.0"
+description = "Local audio analysis and key-sound candidate extraction for Userhythm charting"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "AA1004" }]
+dependencies = [
+  "librosa>=0.10.2",
+  "numpy>=1.24",
+  "soundfile>=0.12"
+]
+
+[project.optional-dependencies]
+stems = ["demucs>=4.0.1"]
+
+[project.scripts]
+userhythm-key-splitter = "userhythm_key_splitter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
