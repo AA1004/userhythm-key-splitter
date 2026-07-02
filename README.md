@@ -50,6 +50,39 @@ userhythm-key-splitter analyze "song.mp3" --bpm 126 --offset-ms -235 --sensitivi
 userhythm-key-splitter analyze "song.wav" --mode detailed --output "song.userhythm-analysis.json"
 ```
 
+
+## Dataset pipeline
+
+Use this flow when you have Userhythm chart JSON files and local audio files prepared separately. The tool builds a manifest, matches charts to audio files, analyzes confirmed pairs, and exports training labels for future model work.
+
+```powershell
+userhythm-key-splitter dataset init datasets
+userhythm-key-splitter dataset scan-charts datasets "C:\Users\user\Downloads\charts"
+userhythm-key-splitter dataset scan-audio datasets "D:\Music"
+userhythm-key-splitter dataset match datasets --accept-threshold 0.68
+userhythm-key-splitter dataset analyze datasets --mode balanced
+userhythm-key-splitter dataset export-training datasets
+```
+
+Generated structure:
+
+```text
+datasets/
+  dataset.json
+  analysis/
+    <pair-id>.userhythm-analysis.json
+  training/
+    onset-note-labels.jsonl
+```
+
+- `dataset.json`: manifest for charts, audio files, and confirmed chart/audio pairs.
+- `analysis/`: onset/beat/band analysis JSON for each confirmed audio file.
+- `training/onset-note-labels.jsonl`: JSONL rows that connect detected onsets to nearby chart notes.
+
+Auto matching is filename/title based and should be treated as a convenience step. If a match is wrong, edit `dataset.json` and set the pair's `audioId` and `confirmed` values manually.
+
+The first training export is onset-based. It records whether each detected onset has a nearby chart note, plus the nearest lane/type/duration when available. This is not full auto-chart generation yet; it is the data foundation for a later key-sound and note-suggestion model.
+
 ## Userhythm 에디터와 연동
 
 1. 이 도구로 `.userhythm-analysis.json`을 생성합니다.
